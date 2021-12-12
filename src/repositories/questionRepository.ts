@@ -1,6 +1,7 @@
 import connection from '../database/database';
 import * as helper from '../helpers/questionRepositoryHelper';
 import { QuestionDB } from '../interfaces/question';
+import { UserInput } from '../interfaces/user';
 
 const findQuestionByText = async (question: string) => {
   const result = await connection.query(
@@ -37,4 +38,18 @@ const insertQuestion = async ({
   return result.rows[0].id;
 };
 
-export { findQuestionByText, insertQuestion };
+const findUserByName = async (name: string) => {
+  const result = await connection.query(
+    'SELECT * FROM student WHERE name = $1',
+    [name],
+  );
+
+  return result.rowCount;
+};
+
+const insertUser = async ({ name, class: className, token }: UserInput) => {
+  await helper.insertClass(className);
+  await helper.insertStudent(name, className, token);
+};
+
+export { findQuestionByText, insertQuestion, findUserByName, insertUser };
