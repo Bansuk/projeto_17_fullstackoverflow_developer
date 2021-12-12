@@ -16,11 +16,15 @@ const insertClass = async (className: string) => {
   ]);
 };
 
-const insertStudent = async (student: string, className: string) => {
+const insertStudent = async (
+  student: string,
+  className: string,
+  token: string = '',
+) => {
   if (await findOne('student', student)) return;
   await connection.query(
-    'INSERT INTO student(name, class_id) VALUES ($1, (SELECT id FROM class WHERE name = $2));',
-    [student, className],
+    'INSERT INTO student(name, token, class_id) VALUES ($1, $2, (SELECT id FROM class WHERE name = $3));',
+    [student, token, className],
   );
 };
 
