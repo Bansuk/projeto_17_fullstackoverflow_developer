@@ -4,6 +4,7 @@ import {
   QuestionDB,
   QuestionUnanswered,
   QuestionUpdate,
+  QuestionUn,
 } from '../interfaces/question';
 import { UserInput } from '../interfaces/user';
 
@@ -74,6 +75,14 @@ const updateQuestion = async ({ answer, id, token }: QuestionUpdate) => {
   return result.rows[0];
 };
 
+const selectUnansweredQuestions = async (): Promise<QuestionUn[]> => {
+  const result = await connection.query(
+    'SELECT question.id, question, student.name AS student, class.name AS class, submited_at FROM question JOIN student ON question.author_id = student.id JOIN class ON student.class_id = class.id WHERE answered = false;',
+  );
+
+  return result.rows;
+};
+
 export {
   findQuestionByText,
   insertQuestion,
@@ -81,4 +90,5 @@ export {
   insertUser,
   findQuestionById,
   updateQuestion,
+  selectUnansweredQuestions,
 };

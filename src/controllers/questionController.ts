@@ -69,4 +69,19 @@ const newAnswer = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { newQuestion, newUser, newAnswer };
+const getQuestions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const questions = await questionService.retrieveUnansweredQuestions();
+    return res.status(200).send(questions);
+  } catch (error) {
+    if (error.name === 'QuestionError')
+      return res.status(404).send(error.message);
+    next(error);
+  }
+};
+
+export { newQuestion, newUser, newAnswer, getQuestions };

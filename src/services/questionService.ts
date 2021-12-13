@@ -68,4 +68,19 @@ const createAnswer = async ({ answer, id, token }: QuestionUpdate) => {
   return { updatedQuestion };
 };
 
-export { createQuestion, createUser, createAnswer };
+const retrieveUnansweredQuestions = async () => {
+  const unansweredQuestions =
+    await questionRepository.selectUnansweredQuestions();
+
+  if (!unansweredQuestions.length)
+    throw new QuestionError('There are no unanswered questions available.');
+
+  return unansweredQuestions;
+};
+
+export {
+  createQuestion,
+  createUser,
+  createAnswer,
+  retrieveUnansweredQuestions,
+};
