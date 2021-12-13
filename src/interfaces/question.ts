@@ -14,31 +14,27 @@ interface QuestionUnanswered extends QuestionInput {
   submitedAt: string;
 }
 
+interface QuestionAnswered extends QuestionUnanswered {
+  answeredAt: string;
+  answeredBy: string;
+  answer: string;
+}
+
 interface QuestionUpdate {
   answer: string;
   id: string;
   token: string;
 }
 
-interface QuestionFull extends QuestionInput {
+interface QuestionUnansweredWithId extends Omit<QuestionInput, 'tags'> {
   id: number;
-  answered: boolean;
-  submitedAt: string;
-  answeredAt: string;
-  answeredBy: string;
-  answer: string;
-}
-
-interface QuestionUn extends Omit<QuestionInput, 'tags'> {
-  id: number;
-  submitedAt: string;
 }
 
 export {
   QuestionInput,
   QuestionDB,
   QuestionUnanswered,
+  QuestionAnswered,
   QuestionUpdate,
-  QuestionFull,
-  QuestionUn,
+  QuestionUnansweredWithId,
 };

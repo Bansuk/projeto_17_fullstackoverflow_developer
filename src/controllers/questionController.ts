@@ -84,4 +84,17 @@ const getQuestions = async (
   }
 };
 
-export { newQuestion, newUser, newAnswer, getQuestions };
+const getQuestion = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
+  try {
+    const question = await questionService.retrieveQuestion(id);
+    return res.status(200).send(question);
+  } catch (error) {
+    if (error.name === 'QuestionError')
+      return res.status(404).send(error.message);
+    next(error);
+  }
+};
+
+export { newQuestion, newUser, newAnswer, getQuestions, getQuestion };
