@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { QuestionInput, QuestionUpdate } from '../interfaces/question';
 import { UserInput } from '../interfaces/user';
+import { rearrangeTags } from '../helpers/questionServiceHelper';
 import QuestionError from '../errors/QuestionError';
 import * as questionRepository from '../repositories/questionRepository';
 import UserError from '../errors/UserError';
@@ -78,9 +79,32 @@ const retrieveUnansweredQuestions = async () => {
   return unansweredQuestions;
 };
 
+const retrieveQuestion = async (id: string) => {
+  const doesQuestionExist = await questionRepository.findQuestionById(id);
+
+  if (!doesQuestionExist)
+    throw new QuestionError(
+      'The provided id does not match any available question.',
+    );
+
+  const isQuestionAnswered = doesQuestionExist.answered;
+
+  let questions = await questionRepository.selectUnansweredQuestion(id);
+
+  if (isQuestionAnswered) {
+    questions = await questionRepository.selectAnsweredQuestion(id);
+  }
+
+  const question = questions[0];
+  question.tags = rearrangeTags(questions);
+
+  return question;
+};
+
 export {
   createQuestion,
   createUser,
   createAnswer,
   retrieveUnansweredQuestions,
+  retrieveQuestion,
 };
