@@ -3,6 +3,7 @@ import { QuestionInput } from '../interfaces/question';
 import { isQuestionInputValid } from '../validations/questionValidation';
 import * as questionService from '../services/questionService';
 import { isUserInputValid } from '../validations/userValidation';
+import { isAnswerInputValid } from '../validations/answerValidation';
 
 const newQuestion = async (req: Request, res: Response, next: NextFunction) => {
   const { question, student, class: className, tags }: QuestionInput = req.body;
@@ -42,4 +43,30 @@ const newUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { newQuestion, newUser };
+const newAnswer = async (req: Request, res: Response, next: NextFunction) => {
+  const { answer }: { answer: string } = req.body;
+
+  if (!isAnswerInputValid({ answer })) return res.sendStatus(400);
+
+  const { authorization } = req.headers;
+  const token = authorization?.split('Bearer ')[1];
+
+  if (!token) res.sendStatus(401);
+
+  const { id } = req.params;
+
+  try {
+    const updatedQuestion: object = await questionService.createAnswer({
+      answer,
+      id,
+      token,
+    });
+    return res.status(200).send(updatedQuestion);
+  } catch (error) {
+    if (error.name === 'QuestionError')
+      return res.status(409).send(error.message);
+    next(error);
+  }
+};
+
+export { newQuestion, newUser, newAnswer };

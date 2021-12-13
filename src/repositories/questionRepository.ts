@@ -1,6 +1,10 @@
 import connection from '../database/database';
 import * as helper from '../helpers/questionRepositoryHelper';
-import { QuestionDB } from '../interfaces/question';
+import {
+  QuestionDB,
+  QuestionUnanswered,
+  QuestionUpdate,
+} from '../interfaces/question';
 import { UserInput } from '../interfaces/user';
 
 const findQuestionByText = async (question: string) => {
@@ -52,4 +56,29 @@ const insertUser = async ({ name, class: className, token }: UserInput) => {
   await helper.insertStudent(name, className, token);
 };
 
-export { findQuestionByText, insertQuestion, findUserByName, insertUser };
+const findQuestionById = async (id: string): Promise<QuestionUnanswered> => {
+  const result = await connection.query(
+    'SELECT * FROM question WHERE id = $1',
+    [id],
+  );
+
+  return result.rows[0];
+};
+
+const updateQuestion = async ({ answer, id, token }: QuestionUpdate) => {
+  const result = await connection.query(
+    'UPDATE question SET answered = true, answered_at = CURRENT_TIMESTAMP, answer = $1, answerer_id = (SELECT id FROM student WHERE token = $2) WHERE id = $3 RETURNING *',
+    [answer, token, id],
+  );
+
+  return result.rows[0];
+};
+
+export {
+  findQuestionByText,
+  insertQuestion,
+  findUserByName,
+  insertUser,
+  findQuestionById,
+  updateQuestion,
+};
