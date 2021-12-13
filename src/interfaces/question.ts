@@ -9,4 +9,15 @@ interface QuestionDB extends Omit<QuestionInput, 'tags'> {
   tags: string[];
 }
 
-export { QuestionInput, QuestionDB };
+interface QuestionUnanswered extends QuestionInput {
+  answered: boolean;
+  submitedAt: string;
+}
+
+interface QuestionUpdate {
+  answer: string;
+  id: string;
+  token: string;
+}
+
+export { QuestionInput, QuestionDB, QuestionUnanswered, QuestionUpdate };
